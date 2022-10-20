@@ -32,9 +32,12 @@ jobs:
     - name: Restore .NET dependencies
       run: dotnet restore
 
-    - name: dotnet build + publish
+    - name: dotnet build
       run: 
-        dotnet build --configuration release
+        dotnet build --configuration release        
+    
+    - name: dotnet publish
+      run:
         dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PATH }}/myapp'
 
     - name: Run unit Test
