@@ -67,7 +67,7 @@ jobs:
     environment:
       name: QA
       url: https://fbwinn-poc-QA.azurewebsites.net/
-    needs: Dev
+    needs: Staging
 
     runs-on: ubuntu-latest
 
