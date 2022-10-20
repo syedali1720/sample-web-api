@@ -34,7 +34,7 @@ jobs:
 
     - name: dotnet build + publish
       run: 
-        dotnet build --configuration release --no-restore
+        dotnet build --configuration release
         dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PATH }}/myapp'
 
     - name: Run unit Test
