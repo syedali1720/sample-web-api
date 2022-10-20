@@ -17,7 +17,7 @@ env:
 
 jobs:
   staging:
-    name: Dev
+    name: Deploy to Dev
     environment: 
       name: Dev
       url: https://fbwinn-poc.azurewebsites.net/
