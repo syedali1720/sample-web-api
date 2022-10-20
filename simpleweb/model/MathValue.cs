@@ -60,7 +60,7 @@ namespace simpleweb.model
 
         public string ver
         {
-            get { return "v1.02"; }
+            get { return "v1.05"; }
         }
 
         public TimeSpan Duration 
