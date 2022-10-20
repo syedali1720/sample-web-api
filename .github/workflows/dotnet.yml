@@ -16,7 +16,7 @@ env:
   dotnet-version: '6.0.X'
 
 jobs:
-  staging:
+  Dev:
     name: Deploy to Dev
     environment: 
       name: Dev
@@ -67,7 +67,7 @@ jobs:
     environment:
       name: QA
       url: https://fbwinn-poc-QA.azurewebsites.net/
-    needs: Staging
+    needs: Dev
 
     runs-on: ubuntu-latest
 
