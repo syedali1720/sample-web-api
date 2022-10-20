@@ -3,8 +3,12 @@ name: Build.NET Application
 on:
   push:
     branches: [ "main" ]
-  #pull_request:
-  #  branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'Where to release (Dev or QA)?'
+        required: true
+        default: 'Dev'
 
 env:
   AZURE_WEBAPP_NAME: fbwinn-poc
@@ -12,39 +16,93 @@ env:
   dotnet-version: '6.0.X'
 
 jobs:
-  build-and-deploy:
-
+  staging:
+    name: Deploy to 'Dev'
+    environment: 
+      name: Dev
+      url: https://fbwinn-poc.azurewebsites.net/
+    #build-and-deploy:
+  #
     runs-on: ubuntu-latest
     steps:
-
+  #
     - uses: actions/checkout@v3
 
+    - run: env
+  #
     - name: Login via Azure CLI
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
+  #
     - name: Install .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.dotnet-version }}
-
+  #
     - name: Restore .NET dependencies
       run: dotnet restore
-
+      
     - name: dotnet build
       run: 
         dotnet build --configuration release        
-    
+    #  
     - name: dotnet publish
       run:
         dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PATH }}/myapp'
-
+  #
     - name: Run unit Test
       run: dotnet test --no-build --verbosity normal
-
+  #
     - name: Deploy to App Service
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         package: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
+        slot-name: Dev
+
+  QA:
+    if: github.event.inputs.releaseType == 'QA'
+    name: Deploy to QA
+    environment:
+      name: QA
+      url: https://fbwinn-poc-QA.azurewebsites.net/
+    needs: [Dev]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: env
+  #
+    - name: Login via Azure CLI
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #
+    - name: Install .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.dotnet-version }}
+  #
+    - name: Restore .NET dependencies
+      run: dotnet restore
+      
+    - name: dotnet build
+      run: 
+        dotnet build --configuration release        
+    #  
+    - name: dotnet publish
+      run:
+        dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PATH }}/myapp'
+  #
+    - name: Run unit Test
+      run: dotnet test --no-build --verbosity normal
+  #
+    - name: Deploy to App Service
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}-QA
+        package: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
+        slot-name: QA
