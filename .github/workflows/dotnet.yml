@@ -3,23 +3,45 @@ name: Build.NET Application
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+
+env:
+  AZURE_WEBAPP_NAME: fbwinn-poc
+  AZURE_WEBAPP_PATH: '.'
+  dotnet-version: '6.0.X'
 
 jobs:
-  build:
+  build-and-deploy:
 
     runs-on: ubuntu-latest
-
     steps:
+
     - uses: actions/checkout@v3
+
+    - name: Login via Azure CLI
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     - name: Install .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: ${{ env.dotnet-version }}
+
     - name: Restore .NET dependencies
       run: dotnet restore
-    - name: Build Soulution
-      run: dotnet build --no-restore
+
+    - name: dotnet build + publish
+      run: 
+        dotnet build --configuration release --no-restore
+        dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PATH }}/myapp'
+
     - name: Run unit Test
       run: dotnet test --no-build --verbosity normal
+
+    - name: Deploy to App Service
+      uses: azure/webapp-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        package: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
