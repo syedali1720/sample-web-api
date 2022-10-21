@@ -17,7 +17,7 @@ env:
 
 jobs:
   Dev:
-    name: Deploy to Dev
+    name: Build Solution
     environment: 
       name: Dev
       url: https://fbwinn-poc-dev.azurewebsites.net/
@@ -63,14 +63,14 @@ jobs:
         retention-days: 90
 
   deploy:
-    name: Deploy
+    name: Deploy to Dev
     needs: Dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       - name: download Artifact
-        uses: actions/download-artifact@v2.2.0
+        uses: actions/download-artifact@v3
         with:
           name: fbwinnpocartifacts
           path: '${{ env.AZURE_WEBAPP_PATH }}/myapp'  
