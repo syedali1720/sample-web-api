@@ -20,7 +20,7 @@ jobs:
     name: Deploy to Dev
     environment: 
       name: Dev
-      url: https://fbwinn-poc.azurewebsites.net/
+      url: https://fbwinn-poc-dev.azurewebsites.net/
     #build-and-deploy:
   #
     runs-on: ubuntu-latest
