@@ -61,14 +61,26 @@ jobs:
         path: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
         if-no-files-found: error
         retention-days: 90
-  
+
+  deploy:
+    name: Deploy
+    needs: Dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: download Artifact
+        uses: actions/download-artifact@v2.2.0
+        with:
+          name: fbwinnpocartifacts
+          path: '${{ env.AZURE_WEBAPP_PATH }}/myapp'  
   #
-    - name: Deploy to App Service
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        package: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
-        slot-name: Dev
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
+          slot-name: Dev
 
   QA:
     if: github.event.inputs.releaseType == 'QA'
