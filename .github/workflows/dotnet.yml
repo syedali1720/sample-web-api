@@ -42,6 +42,9 @@ jobs:
   #
     - name: Restore .NET dependencies
       run: dotnet restore
+    
+    - name: Run unit Test
+      run: dotnet test --no-build --verbosity normal
       
     - name: dotnet build
       run: 
@@ -50,9 +53,15 @@ jobs:
     - name: dotnet publish
       run:
         dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PATH }}/myapp'
-  #
-    - name: Run unit Test
-      run: dotnet test --no-build --verbosity normal
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v2.2.0
+      with:
+        name: fbwinnpocartifacts
+        path: '${{ env.AZURE_WEBAPP_PATH }}/myapp'
+        if-no-files-found: error
+        retention-days: 90
+  
   #
     - name: Deploy to App Service
       uses: azure/webapps-deploy@v2
